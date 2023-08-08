@@ -1,0 +1,165 @@
+// 1
+
+const person = {
+    firstName: "John",
+    lastName: "Doe",
+    age: 30,
+    email: "john.doe@example.com",
+
+    updateInfo(newInfo) {
+        for (const prop in newInfo) {
+            if (this.hasOwnProperty(prop)) {
+                const propertyDescriptor = Object.getOwnPropertyDescriptor(this, prop);
+                if (propertyDescriptor && propertyDescriptor.writable) {
+                    this[prop] = newInfo[prop];
+                }
+            }
+        }
+    }
+}
+
+person.updateInfo({ firstName: "Jane", age: 32 })
+console.log(person)
+
+Object.keys(person).map(elem => Object.defineProperty(person, elem, {
+    writable: false,
+}))
+
+Object.defineProperty(person, "adress", {
+    value: {},
+    configurable: false,
+    enumerable: false,
+})
+// 2
+
+const product = {
+    name: "Laptop",
+    price: 1000,
+    quantity: 5,
+}
+
+Object.defineProperties(product, {
+    'price': {
+        enumerable: false,
+        writable: false
+    },
+    'quantity': {
+        enumerable: false,
+        writable: false
+    }
+});
+
+function getTotalPrice (obj) {
+    const price = Object.getOwnPropertyDescriptor(obj, 'price')
+    const quantity = Object.getOwnPropertyDescriptor(obj, 'quantity')
+    return price.value * quantity.value
+}
+
+function deleteNonConfigurable (obj, propName) {
+    try {
+        if (obj.hasOwnProperty(propName)) {
+            const propDescriptor = Object.getOwnPropertyDescriptor(obj, propName)
+            if (!propDescriptor.configurable) {
+                throw new Error('Cannot delete non-configurable properties')
+            }
+            delete obj[propName]
+        }
+    } catch (e) {
+        console.log(e.message)
+    }
+}
+
+// 3
+
+const bankAccount = {
+    _balance: 1000,
+
+    get formattedBalance() {
+        return `${this._balance}$`
+    },
+
+    set balance(value) {
+        this._balance = value
+    },
+
+    transfer(bankAccount1, bankAccount2, sum) {
+        if (bankAccount1._balance < sum) {
+            return 'Cannot transfer'
+        }
+        const transaction = (bankAccount1._balance -= sum) && (bankAccount2._balance += sum)
+        if (transaction) return 'Success'
+    }
+}
+
+// 4
+
+function createImmutableObject (obj) {
+    const newObject = {}
+    for (let key in obj) {
+        if (typeof obj[key] === 'object') {
+             newObject[key] = createImmutableObject(obj[key])
+        }
+        newObject[key] = obj[key];
+        Object.defineProperty(newObject, key, {
+            writable: false,
+            configurable: false
+        })
+    }
+    return newObject
+}
+
+// 5
+
+function observeObject (obj, callback) {
+    return new Proxy(obj, {
+        get(target, prop) {
+            const value = Reflect.get(target, prop)
+            callback(prop, value)
+            return value
+        },
+        set(target, prop, value) {
+            const prevValue = Reflect.get(target, prop)
+            const result = Reflect.set(target, prop, value)
+            if (prevValue !== value) {
+                callback(prop, value)
+            }
+            return result
+        }
+    })
+}
+
+// 6
+
+function deepCloneObject (obj) {
+    const clone = {}
+
+    for (const key in obj) {
+        if (typeof obj[key] === 'object') {
+            clone[key] = deepCloneObject(obj[key])
+        } else {
+            clone[key] = obj[key]
+        }
+    }
+    return clone
+}
+
+// 7
+
+function validateObject (obj, schema) {
+    for (const key in schema) {
+        if (schema.hasOwnProperty(key)) {
+            const validationFn = schema[key];
+
+            if (!validationFn(obj[key])) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+const schema = {
+    name: (value) => typeof value === 'string' && value.length > 0,
+    price: (value) => typeof value === 'number' && value > 0,
+    category: (value) => ['Electronics', 'Clothing', 'Books'].includes(value),
+};
