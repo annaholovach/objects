@@ -143,29 +143,6 @@ function deepCloneObject (obj) {
     return clone
 }
 
-const cat = {
-    name: 'gusya',
-    age: 4,
-    color: {
-        tail: 'white',
-        body: 'peach'
-    },
-    girls: ['grayCat', 'brownCat'],
-    enemies: ['blackCat']
-}
-
-const ochko = ['grayCat', 'brownCat', 'blackCat']
-
-const newCat = deepCloneObject(cat)
-newCat.girls[0] = 'nastya'
-const newOchko = deepCloneObject(ochko)
-newOchko[0] = 'ahuy'
-
-console.log(newCat)
-console.log(cat)
-console.log(newOchko)
-console.log(ochko)
-
 // 7
 
 function validateObject (obj, schema) {
