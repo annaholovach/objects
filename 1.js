@@ -19,7 +19,7 @@ const person = {
 }
 
 person.updateInfo({ firstName: "Jane", age: 32 })
-console.log(person)
+// console.log(person)
 
 Object.keys(person).map(elem => Object.defineProperty(person, elem, {
     writable: false,
@@ -143,6 +143,47 @@ function deepCloneObject (obj) {
     return clone
 }
 
+function deepCloneObjectWithoutRecursion (obj) {
+    const stack = [{ original: obj, clone: !Array.isArray(obj) ? {} : [] }];
+    const clone = stack[0].clone;
+
+    while (stack.length > 0) {
+        const { original, clone } = stack.pop();
+
+        for (const key in original) {
+            if (typeof original[key] === 'object') {
+                const nestedClone = !Array.isArray(original[key]) ? {} : [];
+                clone[key] = nestedClone;
+                stack.push({ original: original[key], clone: nestedClone });
+            } else {
+                clone[key] = original[key];
+            }
+        }
+    }
+
+    return clone;
+}
+
+const cat = {
+    name: 'Gusya',
+    age: 4,
+    color: {
+        tail: 'white',
+        body: {
+            head: 'peach',
+            osnova: 'white'
+        }
+    },
+    girls: ['grayCat', 'brownCat'],
+    enemies: 'blackCat'
+}
+
+const newCat = deepCloneObject(cat)
+const newCoolCat = deepCloneObjectWithoutRecursion(cat)
+newCoolCat.color.body.head = 'black'
+console.log(cat)
+console.log(newCat)
+console.log(newCoolCat)
 // 7
 
 function validateObject (obj, schema) {
