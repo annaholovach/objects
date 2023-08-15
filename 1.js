@@ -164,26 +164,6 @@ function deepCloneObjectWithoutRecursion (obj) {
     return clone;
 }
 
-const cat = {
-    name: 'Gusya',
-    age: 4,
-    color: {
-        tail: 'white',
-        body: {
-            head: 'peach',
-            osnova: 'white'
-        }
-    },
-    girls: ['grayCat', 'brownCat'],
-    enemies: 'blackCat'
-}
-
-const newCat = deepCloneObject(cat)
-const newCoolCat = deepCloneObjectWithoutRecursion(cat)
-newCoolCat.color.body.head = 'black'
-console.log(cat)
-console.log(newCat)
-console.log(newCoolCat)
 // 7
 
 function validateObject (obj, schema) {
